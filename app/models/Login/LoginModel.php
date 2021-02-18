@@ -15,6 +15,27 @@ public function __construct()
 	{
 		$employee = $this->db->real_escape_string($employee);
 
+		/*$sql = "SELECT *  FROM ctt_users AS usr 
+				INNER JOIN ctt_employees AS emp ON emp.emp_id = usr.emp_id
+				INNER JOIN ctt_profiles AS prf ON prf.prf_id = usr.prf_id 
+				WHERE emp.emp_number = '{$employee}'";*/
+
+		$sql = "SELECT *  FROM ctt_users AS usr 
+		INNER JOIN ctt_employees AS emp ON emp.emp_id = usr.emp_id
+		INNER JOIN ctt_profiles AS prf ON prf.prf_id = usr.prf_id 
+		WHERE usr.usr_username = '{$employee}'";
+
+
+
+				
+		return $this->db->query($sql);
+	}
+
+
+	public function password_verify($employee)
+	{
+		$employee = $this->db->real_escape_string($employee);
+
 		$sql = "SELECT *  FROM ctt_users AS usr 
 				INNER JOIN ctt_employees AS emp ON emp.emp_id = usr.emp_id
 				INNER JOIN ctt_profiles AS prf ON prf.prf_id = usr.prf_id 
@@ -22,4 +43,8 @@ public function __construct()
 				
 		return $this->db->query($sql);
 	}
+
+
+	
+
 }

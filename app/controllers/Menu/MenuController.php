@@ -28,6 +28,8 @@
 // Listado de salidas pendients
 	public function menu($request_params)
 	{
+    print_r('llego');
+    exit();
 	//$params =  $this->session->get('user');
 		$result = $this->model->listaMenu($request_params['userid']);
 		$params = array('menu' => $result);
