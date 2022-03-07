@@ -726,8 +726,6 @@ INNER JOIN  ctt_customers_owner AS co  ON co.cuo_id = pj.cuo_id
 INNER JOIN  ctt_customers as cu        ON cu.cus_id = co.cus_id
 WHERE pj.pjt_status IN (2, 5);
 
-
-
 DROP TRIGGER actualiza_subcategorias;
 CREATE TRIGGER actualiza_subcategorias AFTER UPDATE ON ctt_stores_products
 FOR EACH ROW

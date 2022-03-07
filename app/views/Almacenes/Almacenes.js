@@ -1,5 +1,6 @@
 let strs = null;
 let strnme = '';
+//Modulo de almacenes Js
 
 $(document).ready(function () {
     if (verifica_usuario()) {
@@ -344,7 +345,7 @@ function putSeries(dt) {
             {data: 'produsku', class: 'sku'},
             {data: 'serlnumb', class: 'product-name'},
             {data: 'dateregs', class: 'sku'},
-           /*  {data: 'servcost', class: 'quantity'},
+            /*  {data: 'servcost', class: 'quantity'},
             {data: 'cvsituat', class: 'code-type_s'},
             {data: 'cvestage', class: 'code-type_s'},
             {data: 'comments', class: 'comments'}, */
@@ -372,7 +373,7 @@ function build_modal_serie(dt) {
                 produsku: `${u.prd_sku.slice(0, 7)}-${u.prd_sku.slice(7, 11)}`,
                 serlnumb: u.prd_name,
                 dateregs: u.cantidad,
-               /*  servcost: u.cantidad,
+                /*  servcost: u.cantidad,
                 cvsituat: u.prd_level,
                 cvestage: u.prd_level,
                 comments: u.prd_level, */
