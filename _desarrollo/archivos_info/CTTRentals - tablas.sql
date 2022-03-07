@@ -695,7 +695,7 @@ SELECT
 	ifnull(pjtcn_id,0) AS pjtcn_id, ifnull(cin_id,0) AS cin_id
 FROM ctt_vw_subletting;
 
-
+-- Se agrego la vista de projectos
 DROP VIEW ctt_vw_projects ;
 CREATE VIEW ctt_vw_projects AS
 SELECT
