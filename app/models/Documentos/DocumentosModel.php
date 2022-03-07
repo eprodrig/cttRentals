@@ -9,76 +9,177 @@ class DocumentosModel extends Model
 		parent::__construct();
 	}
 //Guarda proveedor
-	public function SaveDocumento($Nombre,$Code,$Size,$Type,$Content_type,$Documento_binario)
-	{
-        $estatus = 0;
-			try {
 
+public function SaveDocumento($request_params)
+{
+	$estatus = 0;
+	try {
+		$conn = new mysqli(HOST, USER, PASSWORD);
+		$Code = $request_params['CodDocumento'];
+		$nomebreDocumento = $request_params["NomDocumento"];
+		$tipoDocumento = $request_params["tipoDocumento"];
+		$fechaadmision = $request_params["fechaadmision"];
 
+		$fileName = $_FILES['file']['name'];
+		$fileSize = $_FILES['file']['size'];
+		$fileType = $_FILES['file']['type'];
+		$fileNameCmps = explode(".", $fileName);
+		$fileExtension = strtolower(end($fileNameCmps));
+		$file = mysqli_real_escape_string($conn, file_get_contents( $_FILES['file']['tmp_name']));
 
-/* 				$qry = "INSERT INTO ctt_documents(doc_code, doc_name, doc_type, doc_size, doc_content_type, doc_document)
-				VALUES('$Code','$Nombre','$Type',$Size,'$Content_type','$Documento_binario')"; */
-                $qry = "INSERT INTO ctt_documents(doc_code, doc_name, doc_type, doc_size, doc_content_type, doc_document)
-						VALUES('$Code','$Nombre','$Type',$Size,'$Content_type','".real_escape_string(file_get_contents($_FILES['file']['tmp_name']))."')";
-                $this->db->query($qry);	
-				$estatus = 1;
-			} catch (Exception $e) {
-				$estatus = 0;
-			}
-		return $estatus;
+		$newFileName = $fileName;
+
+		$sql = "INSERT INTO ctt_documents(
+				doc_code, doc_name, doc_size, doc_document, doc_content_type, doc_type, dot_id, doc_admission_date)
+				VALUES (
+					UPPER('$Code'), UPPER('$newFileName'), $fileSize, '$file', '$fileType', '$fileExtension', '$tipoDocumento','$fechaadmision');";
+
+		$this->db->query($sql);
+		$lastid = $this->db->insert_id;
+		//return $lastid;
+		
+		/*$qry = "SELECT MAX(doc_id) AS id FROM ctt_documents;";
+		$result = $this->db->query($qry);
+		if ($row = $result->fetch_row()) {
+			$lastid = trim($row[0]);
+		}
+
+		$estatus = $lastid; */
+	} catch (Exception $e) {
+		$lastid = $e;
 	}
-// Optiene los Usuaios existentes
-	public function GetCategorias()
+	return $lastid;
+}
+
+// Optiene los Documentos existentes
+	public function GetDocumentos()
 	{
-		$qry = "SELECT cat_id, cat_name FROM ctt_categories WHERE cat_status = 1;";
+		$qry = "SELECT doc.doc_id, doc.doc_code, doc.doc_name, doc.doc_type, doc.dot_id, td.dot_name, doc.doc_admission_date 
+		FROM ctt_documents as doc LEFT JOIN ctt_documents_type AS td ON td.dot_id = doc.dot_id";
 		$result = $this->db->query($qry);
 		$lista = array();
 		while ($row = $result->fetch_row()){
-			$item = array("cat_id" =>$row[0],
-						"cat_name" =>$row[1]);
+			$item = array("doc_id" =>$row[0],
+						"doc_code" =>$row[1],
+						"doc_name" =>$row[2],
+						"doc_type" =>$row[3],
+						"dot_id" =>$row[4],
+						"dot_name" =>$row[5],
+						"doc_admission_date" =>$row[6]);
 			array_push($lista, $item);
 		}
 		return $lista;
 	}
 
-    public function GetCategoria($params)
+	// Optiene los Documentos existentes
+	public function GetDocumentosFicha()
 	{
-		$qry = "SELECT cat_id, cat_name FROM ctt_categories WHERE cat_id = ".$params['id'].";";
+		$qry = "SELECT doc.doc_id, doc.doc_code, doc.doc_name, doc.doc_type, doc.dot_id, td.dot_name FROM ctt_documents as doc LEFT JOIN ctt_documents_type AS td ON td.dot_id = doc.dot_id WHERE doc.dot_id = 2";
+		$result = $this->db->query($qry);
+		$lista = array();
+		while ($row = $result->fetch_row()){
+			$item = array("doc_id" =>$row[0],
+						"doc_code" =>$row[1],
+						"doc_name" =>$row[2],
+						"doc_type" =>$row[3],
+						"dot_id" =>$row[4],
+						"dot_name" =>$row[5]);
+			array_push($lista, $item);
+		}
+		return $lista;
+	}
+
+    public function GetDocumento($params)
+	{
+		$qry = "SELECT doc_id, doc_code, doc_name,doc_type, dot_id, doc_admission_date 
+		FROM ctt_documents WHERE doc_id = ".$params['id'].";";
 		$result = $this->db->query($qry);
 		if($row = $result->fetch_row()){
-			$item = array("cat_id" =>$row[0],
-			"cat_name" =>$row[1]);
+			$item = array("doc_id" =>$row[0],
+			"doc_code" =>$row[1],
+			"doc_name" =>$row[2],
+			"doc_type" =>$row[3],
+			"dot_id" =>$row[4],
+			"doc_admission_date"=>$row[5]);
 		}
 		return $item;
 	}
 
+	public function GetTypeDocumento($params)
+	{
+		$qry = "SELECT dot_id, dot_name FROM ctt_documents_type WHERE dot_status = 1;";
+		$result = $this->db->query($qry);
+		$lista = array();
+		while ($row = $result->fetch_row()){
+			$item = array("dot_id" =>$row[0],
+			"dot_name" =>$row[1]);
+			array_push($lista, $item);
+		}
+		return $lista;
+	}
 
-    public function ActualizaCategoria($params)
+
+    public function ActualizaDocumento($request_params)
 	{
         $estatus = 0;
 			try {
-                $qry = "UPDATE ctt_categories
-                SET cat_name = '".$params['NomCategoria']."'
-                WHERE cat_id = ".$params['IdCategoria'].";";
+		       if(isset($_FILES['file']['name'])){
+					$conn = new mysqli(HOST, USER, PASSWORD);
+					$Code = $request_params['CodDocumento'];
+					$nomebreDocumento = $request_params["NomDocumento"];
+					$fechaadmision = $request_params["fechaadmision"];
+			
+					$fileName = $_FILES['file']['name'];
+					$fileSize = $_FILES['file']['size'];
+					$fileType = $_FILES['file']['type'];
+					$fileNameCmps = explode(".", $fileName);
+					$fileExtension = strtolower(end($fileNameCmps));
+					$file = mysqli_real_escape_string($conn, file_get_contents( $_FILES['file']['tmp_name']));
+			
+					$newFileName = $fileName;
 
-				$this->db->query($qry);	
-				$estatus = 1;
+					$qry = "UPDATE ctt_documents SET doc_code = UPPER('".$request_params['CodDocumento']."')
+					,doc_name = UPPER('".$request_params['NomDocumento']."')
+					,dot_id = '".$request_params['tipoDocumento']."'
+					,doc_size = $fileSize
+					,doc_type = '$fileExtension'
+					,doc_content_type =  '$fileType'
+					,doc_document = '$file'
+					,doc_admission_date = '$fechaadmision
+					WHERE doc_id = ".$request_params['idDocumento'].";";
+					$this->db->query($qry);
+
+					$estatus =  $request_params['idDocumento']; 
+
+				}else {
+
+					$qry = "UPDATE ctt_documents
+					SET doc_code = UPPER('".$request_params['CodDocumento']."')
+					,dot_id = '".$request_params['tipoDocumento']."'
+					,doc_name = UPPER('".$request_params['NomDocumento']."')
+					,doc_admission_date = '".$request_params['fechaadmision']."'
+					WHERE doc_id = ".$request_params['idDocumento'].";";
+
+					$this->db->query($qry);
+					$estatus =  $request_params['idDocumento']; 
+
+				}			   
 			} catch (Exception $e) {
+
 				$estatus = 0;
 			}
 		return $estatus;
 	}
 
     //borra proveedor
-	public function DeleteCategoria($params)
+	public function DeleteDocumentos($params)
 	{
         $estatus = 0;
         try {
-            $qry = "UPDATE ctt_categories
-                    SET cat_status = 0
-                    WHERE cat_id in (".$params['IdCategoria'].");";
+            $qry = "DELETE FROM ctt_documents
+                    WHERE doc_id in (".$params['IdDocumento'].")";
             $this->db->query($qry);
-            $estatus = 1;
+            $estatus = $qry;
         } catch (Exception $e) {
             $estatus = 0;
         }
@@ -94,10 +195,9 @@ class DocumentosModel extends Model
 			"doc_type" =>$row[1],
 			"doc_size" =>$row[2],
 			"doc_content_type" =>$row[3],
-			"doc_document" =>$row[4]);
+			"doc_document" =>base64_encode($row[4]));
 		}
 		return $item;
 	}
-
 
 }

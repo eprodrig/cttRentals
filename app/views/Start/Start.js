@@ -1,8 +1,8 @@
 var seccion = '';
-
+var campo = '';
 $(document).ready(function () {
-	console.log('start');
-	pos = 4;
-	verifica_usuario();
-	// busca_sidebar();
+    let host = $('#host').text();
+    localStorage.setItem('host', host);
+    pos = 4;
+    verifica_usuario();
 });

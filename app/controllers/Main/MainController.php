@@ -30,7 +30,7 @@ class MainController extends Controller
   public function logout()
   {
     $this->session->close();
-    header('location: '. FOLDER_PATH .'/login');
+    header('location: '. FOLDER_PATH .'/Login');
   }
 
   public function form($message = '')
@@ -59,6 +59,7 @@ class MainController extends Controller
     return $this->render(__CLASS__, $params);
   }
 
+  
   public function addClient($request_params)
   {
     if(!$this->verify($request_params))

@@ -24,9 +24,9 @@ class PerfilUserModel extends Model
 		$lista = array();
 		while ($row = $result->fetch_row()){
 			$item = array("mod_id" =>$row[0],
-						"mod_code" =>$row[1],
-						"mod_name"=>$row[2],
-						"mod_description"=>$row[3]);
+						  "mod_code" =>$row[1],
+						  "mod_name"=>$row[2],
+						  "mod_description"=>$row[3]);
 			array_push($lista, $item);
 		}
 		//print_r($lista);
@@ -72,7 +72,7 @@ class PerfilUserModel extends Model
 			try {
 				//Inserta perfil
 				$qry = "insert into ctt_profiles ( prf_code, prf_name, prf_description, prf_mod_start,prf_status) 
-						values('".$params['CodPerfil']."','".$params['NomPerfil']."','".$params['DesPerfil']."', 'menu',1);";
+						values('".$params['CodPerfil']."','".$params['NomPerfil']."','".$params['DesPerfil']."', 'Start',1);";
 				$this->db->query($qry);
 
 				//optiene id de perfil insertado
@@ -88,7 +88,8 @@ class PerfilUserModel extends Model
 					$qry = "insert into ctt_profile_module (prf_id,mod_id) values (".$lastid.",".$id.");";
 					$this->db->query($qry);
 				}
-				$estatus = 1;
+
+				$estatus = $lastid;
 			} catch (Exception $e) {
 				$estatus = 0;
 				//echo 'Excepción capturada: ',  $e->getMessage(), "\n";
@@ -119,7 +120,7 @@ class PerfilUserModel extends Model
 					$qry = "insert into ctt_profile_module (prf_id,mod_id) values (".$params['IdPerfil'].",".$id.");";
 					$this->db->query($qry);
 				}
-				$estatus = 1;
+				$estatus = $params['IdPerfil'];
 			} catch (Exception $e) {
 				$estatus = 0;
 				//echo 'Excepción capturada: ',  $e->getMessage(), "\n";
